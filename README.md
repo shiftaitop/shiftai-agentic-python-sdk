@@ -2,6 +2,84 @@
 
 This SDK is the official gateway to the Shift AI Agentic Infra services, enabling developers to directly integrate and use agentic capabilities in their applications.
 
+## About ShiftAI
+
+<p align="center">
+  <a href="https://theshiftai.in">
+    <img src="https://img.shields.io/badge/Website-theshiftai.in-blue?style=for-the-badge">
+  </a>
+  <a href="https://github.com/shiftaitop">
+    <img src="https://img.shields.io/badge/GitHub-shiftaitop-black?style=for-the-badge">
+  </a>
+  <a href="https://www.linkedin.com/company/theshiftai-in/">
+    <img src="https://img.shields.io/badge/LinkedIn-ShiftAI-blue?style=for-the-badge&logo=linkedin">
+  </a>
+  <a href="https://x.com/shift_ai_first">
+    <img src="https://img.shields.io/badge/X(Twitter)-@shift__ai__first-black?style=for-the-badge&logo=x">
+  </a>
+</p>
+
+**ShiftAI** is an AI infrastructure and consulting company focused on building
+**production-ready AI systems** that help organizations transform business
+operations using AI.
+
+ShiftAI works with enterprises and product teams to design, integrate, and deploy
+AI-driven systems that move beyond experimentation into real-world production.
+
+---
+
+## Official ShiftAI Links
+
+- 🌐 Website: https://theshiftai.in  
+- 🐙 GitHub Organization: https://github.com/shiftaitop  
+- 💼 LinkedIn (Company): https://www.linkedin.com/company/theshiftai-in/  
+- 🐦 Twitter (X): https://x.com/shift_ai_first  
+
+### Founder
+- **Suresh Gokarakonda**
+- LinkedIn: https://www.linkedin.com/in/gokarakonda/
+
+---
+
+## About ShiftAI Agentic Infrastructure
+
+**ShiftAI Agentic Infrastructure** is a **multi-tenant platform** for managing
+AI-powered conversations, agents, and workflows.
+
+Organizations register as isolated tenants and receive secure API keys for access.
+The platform automatically manages conversation sessions, threads messages between
+humans and agents, and maintains complete conversation history.
+
+It supports multiple LLM providers through a **pluggable architecture**, enabling
+provider switching without application-level changes.
+
+On every interaction, the platform generates AI-enhanced contextual prompts derived
+from conversation history, summarizing conversation flow, key facts, and resolved
+ambiguities. This context is returned to clients and stored for future interactions.
+
+The platform also includes built-in **evaluation and analytics** capabilities that
+assess response quality, relevance, and reasoning across user–agent interactions,
+providing visibility into conversation performance over time.
+
+---
+
+## Platform Usage Overview
+
+Using ShiftAI Agentic Infrastructure through this SDK, applications typically:
+
+1. Initialize the SDK client using project credentials  
+2. Submit human messages to start or continue conversations  
+3. Receive contextual intelligence generated from conversation history  
+4. Generate agent responses using the provided context  
+5. Submit agent responses linked to prior human messages  
+6. Monitor conversations and performance using built-in analytics  
+
+All operations are automatically scoped to the authenticated project, ensuring
+secure isolation between organizations using the platform.
+
+---
+
+
 
 
 
