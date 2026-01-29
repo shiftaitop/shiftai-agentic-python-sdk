@@ -49,6 +49,9 @@ class PlatformMessageSubmissionRequest:
     sourceEvent: Optional[Dict[str, Any]] = None
     ragContext: Optional[str] = None
     replyMessageId: Optional[UUID] = None
+    # Optional conversation ID for HUMAN messages. If omitted, backend creates a new conversation.
+    # For BOT messages, backend determines conversation from replyMessageId and ignores this field.
+    conversationId: Optional[UUID] = None
     mode: Optional[str] = None
 
 
@@ -88,6 +91,25 @@ class PlatformMessageSubmissionResponse:
     similarConversations: Optional[List[WeaviateVector]] = None  # Similar conversations (senderType=HUMAN only)
     operationStatus: Optional[Dict[str, bool]] = None  # Operation status flags (senderType=BOT only)
     conversationTitle: Optional[str] = None  # LLM-generated conversation title
+    # Cache metadata (only present when cache was checked)
+    cacheResponse: Optional[str] = None
+    cacheHit: Optional[bool] = None
+
+
+@dataclass
+class EndConversationRequest:
+    """Request DTO for ending a conversation session."""
+    conversationId: UUID
+
+
+@dataclass
+class EndConversationResponse:
+    """Response DTO for ending a conversation session."""
+    success: Optional[bool] = None
+    message: Optional[str] = None
+    conversationId: Optional[UUID] = None
+    conversationExternalId: Optional[str] = None
+    endedAt: Optional[str] = None  # ISO 8601 datetime string
 
 
 @dataclass
@@ -175,6 +197,8 @@ class PlatformMessage:
     messageEmbedding: Optional[str] = None
     generatedContext: Optional[str] = None
     ragContext: Optional[str] = None
+    cacheHit: Optional[bool] = None
+    cacheResponse: Optional[str] = None
     evalRecordId: Optional[str] = None
     evalSyncStatus: Optional[str] = None
     evalSyncError: Optional[str] = None

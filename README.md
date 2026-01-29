@@ -17,6 +17,12 @@ This SDK is the official gateway to the Shift AI Agentic Infra services, enablin
   <a href="https://x.com/shift_ai_first">
     <img src="https://img.shields.io/badge/X(Twitter)-@shift__ai__first-black?style=for-the-badge&logo=x">
   </a>
+  <a href="https://www.reddit.com/user/TheShiftAI/">
+    <img src="https://img.shields.io/badge/Reddit-TheShiftAI-FF4500?style=for-the-badge&logo=reddit">
+  </a>
+  <a href="https://substack.com/@shiftaifirst">
+    <img src="https://img.shields.io/badge/Substack-ShiftAI-orange?style=for-the-badge&logo=substack">
+  </a>
 </p>
 
 **ShiftAI** is an AI infrastructure and consulting company focused on building
@@ -34,6 +40,9 @@ AI-driven systems that move beyond experimentation into real-world production.
 - 🐙 GitHub Organization: https://github.com/shiftaitop  
 - 💼 LinkedIn (Company): https://www.linkedin.com/company/theshiftai-in/  
 - 🐦 Twitter (X): https://x.com/shift_ai_first  
+- 🔗 Reddit: https://www.reddit.com/user/TheShiftAI/  
+- ✍️ Substack: https://substack.com/@shiftaifirst  
+  
 
 ### Founder
 - **Suresh Gokarakonda**
@@ -125,6 +134,7 @@ async def main():
         message="Hello, how can I help you?",
         agent_name="SupportBot",
         agent_platform="OpenAI",
+        user_email="john@example.com",
         agent_version="1.0.0"  # Required: Agent version 
     )
 
@@ -138,7 +148,8 @@ async def main():
         agent_platform="OpenAI",
         agent_version="1.0.0",  # Required: Agent version 
         reply_message_id=human_response.messageId,
-        rag_context="Retrieved context from knowledge base..."
+        rag_context="Retrieved context from knowledge base...",
+        user_email="john@example.com"
     )
 
     # 4. Get analytics
@@ -194,6 +205,7 @@ Send a human message with automatic user/agent creation.
 - `agent_version` (str, **optional**): Agent version/model (e.g., "gpt-4", "claude-2") - **Required in database**
 - `agent_metadata` (dict, **optional**): Agent configuration data (e.g., `{"temperature": 0.7, "max_tokens": 1000}`)
 - `mode` (str, **optional**): Mode identifier for the message. Allowed values: `"SIMPLE"` or `"EXPAND"`
+- `conversation_id` (UUID, **optional**): Conversation ID to store the HUMAN message in. If omitted, backend creates a new conversation automatically.
 
 **Return Type:** `PlatformMessageSubmissionResponse`
 
@@ -218,6 +230,28 @@ Send a bot response to a human message.
 - `mode` (str, **optional**): Mode identifier for the message. Allowed values: `"SIMPLE"` or `"EXPAND"`
 
 **Return Type:** `PlatformMessageSubmissionResponse`
+
+**Response Notes (Cache):**
+- `cacheHit` / `cacheResponse` may be present when the backend cache API was checked (typically for HUMAN messages).
+
+### Platform Session API
+
+#### `await platform_session.initiate_session(request=None)`
+Initiate a new conversation session.
+
+POST `/api/platformsession/initiate`
+
+**Return Type:** `Dict[str, Any]` (raw response body as returned by the server)
+
+#### `await platform_session.end_conversation(conversation_id)`
+End an active conversation session explicitly.
+
+POST `/api/platformsession/endconversation`
+
+**Parameters:**
+- `conversation_id` (UUID, **required**): Conversation identifier to end
+
+**Return Type:** `EndConversationResponse`
 
 #### `await messages.submit(request)`
 Low-level message submission with full control.

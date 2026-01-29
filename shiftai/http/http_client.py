@@ -239,7 +239,9 @@ class HttpClient:
             
             # Convert dict to response_type object
             if isinstance(data, dict):
-                return response_type(**data)
+                # Filter to known fields to prevent TypeError on unknown fields
+                filtered_data = self._filter_known_fields(data, response_type)
+                return response_type(**filtered_data)
             return data
             
         except (UnauthorizedException, BadRequestException, NotFoundException, ServerException, ApiException):
@@ -291,7 +293,15 @@ class HttpClient:
                 raise ApiException(0, f"Expected list, got {type(data)}")
             
             # Convert list of dicts to list of objects
-            return [element_type(**item) if isinstance(item, dict) else item for item in data]
+            result: List[T] = []
+            for item in data:
+                if isinstance(item, dict):
+                    # Filter to known fields to prevent TypeError on unknown fields
+                    filtered_item = self._filter_known_fields(item, element_type)
+                    result.append(element_type(**filtered_item))
+                else:
+                    result.append(item)
+            return result
             
         except (UnauthorizedException, BadRequestException, NotFoundException, ServerException, ApiException):
             raise
@@ -338,7 +348,9 @@ class HttpClient:
             
             # Convert dict to response_type object
             if isinstance(data, dict):
-                return response_type(**data)
+                # Filter to known fields to prevent TypeError on unknown fields
+                filtered_data = self._filter_known_fields(data, response_type)
+                return response_type(**filtered_data)
             return data
             
         except (UnauthorizedException, BadRequestException, NotFoundException, ServerException, ApiException):

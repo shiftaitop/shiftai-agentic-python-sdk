@@ -13,7 +13,7 @@ def read_readme():
 
 setup(
     name="shiftaiagenticinfra-sdk-python",
-    version="0.0.1",
+    version="0.0.6",
     description="Shiftai Agentic Infra Python SDK",
     long_description=read_readme(),
     long_description_content_type="text/markdown",

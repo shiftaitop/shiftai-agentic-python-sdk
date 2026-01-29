@@ -6,6 +6,7 @@ from .users_api import UsersApi
 from .agents_api import AgentsApi
 from .analytics_api import AnalyticsApi
 from .conversations_api import ConversationsApi
+from .platform_session_api import PlatformSessionApi
 
 __all__ = [
     "PlatformApi",
@@ -14,5 +15,6 @@ __all__ = [
     "AgentsApi",
     "AnalyticsApi",
     "ConversationsApi",
+    "PlatformSessionApi",
 ]
 

@@ -35,6 +35,7 @@ class MessagesApi:
         agent_version: Optional[str] = None,
         agent_metadata: Optional[Dict[str, Any]] = None,
         mode: Optional[str] = None,
+        conversation_id: Optional[UUID] = None,
     ) -> PlatformMessageSubmissionResponse:
         """
         Send a human message.
@@ -56,6 +57,7 @@ class MessagesApi:
             agent_version: Optional agent version or model identifier
             agent_metadata: Optional additional agent configuration metadata
             mode: Optional mode identifier for the message
+            conversation_id: Optional conversation ID for HUMAN messages. If not provided, backend creates a new conversation.
             
         Returns:
             PlatformMessageSubmissionResponse with message ID and contextual prompt
@@ -101,6 +103,7 @@ class MessagesApi:
             agentData=agent_data,
             senderType="HUMAN",  # Auto-set
             messageType="TEXT",  # Auto-set
+            conversationId=conversation_id,
             mode=mode
         )
         

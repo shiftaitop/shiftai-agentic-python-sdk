@@ -9,6 +9,7 @@ shiftai/api/analytics_api.py
 shiftai/api/conversations_api.py
 shiftai/api/messages_api.py
 shiftai/api/platform_api.py
+shiftai/api/platform_session_api.py
 shiftai/api/users_api.py
 shiftai/api/internal/__init__.py
 shiftai/api/internal/trulens_api.py

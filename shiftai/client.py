@@ -12,6 +12,7 @@ from .api import (
     AgentsApi,
     AnalyticsApi,
     ConversationsApi,
+    PlatformSessionApi,
 )
 from .api.internal.trulens_api import EvalApi
 
@@ -68,6 +69,7 @@ class ShiftaiagenticinfraClient:
         self.agents = AgentsApi(self._http_client)
         self.analytics = AnalyticsApi(self._http_client)
         self.conversations = ConversationsApi(self._http_client)
+        self.platform_session = PlatformSessionApi(self._http_client)
         self.internal = InternalApi(self._http_client)
 
     def _ensure_api_key(self) -> None:
