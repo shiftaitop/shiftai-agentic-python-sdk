@@ -330,17 +330,26 @@ print(f"Created agent: {agent.name}")
 
 ### Analytics API
 
-#### `await analytics.submit_feedback(message_id, like=None, dislike=None, feedback=None, regeneration=None)`
-Submit user feedback on a bot message.
+#### `await analytics.submit_feedback(message_id, feedback_title, feedback, liked=None, disliked=None, regeneration=None)`
+Submit user feedback on a BOT message (multiple feedback per message allowed).
 
 **Parameters:**
-- `message_id` (UUID, **required**): ID of the bot message receiving feedback
-- `like` (bool, **optional**): User liked the response (true/false)
-- `dislike` (bool, **optional**): User disliked the response (true/false)
-- `feedback` (str, **optional**): Text feedback or comments (e.g., "Too verbose", "Perfect answer")
+- `message_id` (UUID, **required**): ID of the BOT message receiving feedback
+- `feedback_title` (str, **required**): Title for the feedback (e.g., "Response Quality Feedback")
+- `feedback` (str, **required**): Feedback content (e.g., "The response was very helpful")
+- `liked` (bool, **optional**): User liked the response (true/false)
+- `disliked` (bool, **optional**): User disliked the response (true/false)
 - `regeneration` (bool, **optional**): User requested regeneration (true/false)
 
-**Return Type:** `FeedbackSubmissionResponse`
+**Return Type:** `FeedbackSubmissionResponse` (includes `feedbackId`, `submittedAt`)
+
+#### `await analytics.get_message_feedback(message_id)`
+Get all feedback submissions for a specific BOT message (most recent first).
+
+**Parameters:**
+- `message_id` (UUID, **required**): UUID of the BOT message
+
+**Return Type:** `List[FeedbackDTO]`
 
 #### `await analytics.get_dashboard()`
 Get project dashboard metrics.

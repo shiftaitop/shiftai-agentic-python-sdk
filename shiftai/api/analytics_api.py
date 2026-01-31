@@ -9,6 +9,7 @@ from ..http import HttpClient
 from ..models import (
     FeedbackSubmissionRequest,
     FeedbackSubmissionResponse,
+    FeedbackDTO,
     DashboardMetricsDTO,
     TopAgentDTO,
     TopUserDTO,
@@ -26,49 +27,82 @@ class AnalyticsApi:
     async def submit_feedback(
         self,
         message_id: UUID,
-        like: Optional[bool] = None,
-        dislike: Optional[bool] = None,
-        feedback: Optional[str] = None,
+        feedback_title: str,
+        feedback: str,
+        liked: Optional[bool] = None,
+        disliked: Optional[bool] = None,
         regeneration: Optional[bool] = None,
     ) -> FeedbackSubmissionResponse:
         """
-        Submit feedback for a BOT message.
-        
+        Submit feedback for a BOT message (multiple feedback per message allowed).
+
         POST /api/analytics/data
-        
+
         Args:
             message_id: The ID of the BOT message that received feedback (required)
-            like: Like feedback indicator (optional)
-            dislike: Dislike feedback indicator (optional)
-            feedback: Optional text feedback or comments (optional)
-            regeneration: Indicates if user requested to regenerate (optional)
-            
+            feedback_title: Title for the feedback (required)
+            feedback: Feedback content (required)
+            liked: Like rating (optional)
+            disliked: Dislike rating (optional)
+            regeneration: User requested regeneration (optional)
+
         Returns:
-            FeedbackSubmissionResponse
-            
+            FeedbackSubmissionResponse with feedbackId and submittedAt
+
         Raises:
-            ValueError: If message_id is missing or API key is not configured
+            ValueError: If message_id, feedback_title or feedback is missing
             ApiException: If the API request fails
         """
         self._http_client.ensure_authenticated()
 
         if message_id is None:
             raise ValueError("message_id is required")
-        
+        if not feedback_title or not feedback_title.strip():
+            raise ValueError("feedback_title is required")
+        if not feedback or not feedback.strip():
+            raise ValueError("feedback is required")
+
         request = FeedbackSubmissionRequest(
             messageId=message_id,
-            like=like,
-            dislike=dislike,
-            feedback=feedback,
-            regeneration=regeneration
+            feedbackTitle=feedback_title.strip(),
+            feedback=feedback.strip(),
+            liked=liked,
+            disliked=disliked,
+            regeneration=regeneration,
         )
-        
+
         return await self._http_client.post(
             "/api/analytics/data",
             request,
-            FeedbackSubmissionResponse
+            FeedbackSubmissionResponse,
         )
-    
+
+    async def get_message_feedback(self, message_id: UUID) -> List[FeedbackDTO]:
+        """
+        Get all feedback submissions for a specific BOT message (most recent first).
+
+        GET /api/analytics/messages/{messageId}/feedback
+
+        Args:
+            message_id: UUID of the BOT message (required)
+
+        Returns:
+            List of FeedbackDTO, ordered by submittedAt descending
+
+        Raises:
+            ValueError: If message_id is missing
+            ApiException: If the API request fails
+        """
+        self._http_client.ensure_authenticated()
+
+        if message_id is None:
+            raise ValueError("message_id is required")
+
+        return await self._http_client.get_list(
+            f"/api/analytics/messages/{message_id}/feedback",
+            FeedbackDTO,
+        )
+
     async def get_dashboard(self) -> DashboardMetricsDTO:
         """
         Get dashboard metrics.

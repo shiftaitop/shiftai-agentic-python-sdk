@@ -152,20 +152,34 @@ class Agent:
 
 @dataclass
 class FeedbackSubmissionRequest:
-    """Request for submitting feedback."""
-    messageId: UUID
-    like: Optional[bool] = None
-    dislike: Optional[bool] = None
-    feedback: Optional[str] = None
-    regeneration: Optional[bool] = None
+    """Request for submitting feedback (multiple feedback per BOT message)."""
+    messageId: UUID  # required - BOT message ID
+    feedbackTitle: str  # required - Feedback title
+    feedback: str  # required - Feedback content
+    liked: Optional[bool] = None  # optional - Like rating (renamed from like)
+    disliked: Optional[bool] = None  # optional - Dislike rating (renamed from dislike)
+    regeneration: Optional[bool] = None  # optional - Regeneration request
 
 
 @dataclass
 class FeedbackSubmissionResponse:
     """Response from feedback submission."""
     success: Optional[bool] = None
+    feedbackId: Optional[UUID] = None  # Feedback entry ID (was botMessageId)
     message: Optional[str] = None
-    botMessageId: Optional[UUID] = None
+    submittedAt: Optional[str] = None  # ISO 8601 datetime string
+
+
+@dataclass
+class FeedbackDTO:
+    """Single feedback entry for a BOT message (GET feedback list)."""
+    id: Optional[UUID] = None  # Feedback entry ID
+    feedbackTitle: Optional[str] = None
+    feedback: Optional[str] = None
+    liked: Optional[bool] = None
+    disliked: Optional[bool] = None
+    regeneration: Optional[bool] = None
+    submittedAt: Optional[str] = None  # ISO 8601 datetime string
 
 
 @dataclass(init=False)

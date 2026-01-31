@@ -156,12 +156,14 @@ async def test_complete_sdk_flow():
         print("Step 7: Submitting feedback...")
         feedback_response = await client.analytics.submit_feedback(
             message_id=bot_message_id,
-            like=True,
-            feedback="Great response, very helpful!"
+            feedback_title="Response Quality Feedback",
+            feedback="Great response, very helpful!",
+            liked=True,
         )
         
         assert feedback_response is not None, "Feedback response should not be null"
         assert feedback_response.success is True, "Feedback submission should be successful"
+        assert feedback_response.feedbackId is not None, "Feedback ID should be returned"
         print("✓ Feedback submitted\n")
         
         # Step 8: Get dashboard metrics
