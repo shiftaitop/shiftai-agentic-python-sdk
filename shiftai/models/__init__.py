@@ -182,6 +182,12 @@ class FeedbackDTO:
     submittedAt: Optional[str] = None  # ISO 8601 datetime string
 
 
+@dataclass
+class DeleteMessageRequest:
+    """Request for soft-deleting a message turn (bot message and its paired human)."""
+    messageId: UUID  # required – bot message ID
+
+
 @dataclass(init=False)
 class PlatformMessage:
     """Platform message model - matches backend JPA entity."""
@@ -254,6 +260,9 @@ class DashboardMetricsDTO:
     likes: Optional[int] = None
     dislikes: Optional[int] = None
     regenerates: Optional[int] = None
+    cacheServed: Optional[int] = None
+    estimatedTokensSaved: Optional[int] = None
+    estimatedCostSaved: Optional[float] = None
 
 
 @dataclass
@@ -289,6 +298,9 @@ class UserAnalyticsDTO:
     likes: Optional[int] = None
     dislikes: Optional[int] = None
     regenerates: Optional[int] = None
+    cacheServed: Optional[int] = None
+    estimatedTokensSaved: Optional[int] = None
+    estimatedCostSaved: Optional[float] = None
 
 
 @dataclass
@@ -303,6 +315,9 @@ class ProjectAnalyticsResponseDTO:
     likes: Optional[int] = None
     dislikes: Optional[int] = None
     regenerates: Optional[int] = None
+    cacheServed: Optional[int] = None
+    estimatedTokensSaved: Optional[int] = None
+    estimatedCostSaved: Optional[float] = None
     topUserActivity: Optional[List[Any]] = None
     topDevicesByUsage: Optional[List[Any]] = None
 

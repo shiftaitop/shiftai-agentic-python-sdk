@@ -11,6 +11,7 @@ from ..models import (
     PlatformMessageSubmissionResponse,
     PlatformMessage,
     AgentData,
+    DeleteMessageRequest,
 )
 
 
@@ -291,3 +292,23 @@ class MessagesApi:
             PlatformMessage
         )
 
+    async def delete_message(self, message_id: UUID) -> Dict[str, Any]:
+        """
+        Soft-delete a message turn (bot message and its paired human message).
+
+        POST /api/platform/messages/delete
+
+        Idempotent if the message is already deleted. Returns a map with
+        success, message, timestamp (or error fields on failure).
+
+        Args:
+            message_id: UUID of the BOT message to soft-delete (required)
+
+        Returns:
+            Dict with success, message, timestamp (or error, message, status, timestamp on error)
+        """
+        self._http_client.ensure_authenticated()
+        if message_id is None:
+            raise ValueError("message_id is required")
+        request = DeleteMessageRequest(messageId=message_id)
+        return await self._http_client.post_map("/api/platform/messages/delete", request)

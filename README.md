@@ -282,6 +282,14 @@ Get all messages sent by a specific agent.
 
 **Return Type:** `List[PlatformMessage]`
 
+#### `await messages.delete_message(message_id)`
+delete a message turn (bot message and its paired human message). Idempotent if already deleted.
+
+**Parameters:**
+- `message_id` (UUID, required): UUID of the **BOT** message to soft-delete
+
+**Return Type:** `Dict[str, Any]` (success: `success`, `message`, `timestamp`; errors: `error`, `message`, `status`, `timestamp`)
+
 ### Users API
 
 #### `await users.create(username, email, metadata=None)`
@@ -352,7 +360,7 @@ Get all feedback submissions for a specific BOT message (most recent first).
 **Return Type:** `List[FeedbackDTO]`
 
 #### `await analytics.get_dashboard()`
-Get project dashboard metrics.
+Get project dashboard metrics (includes cache analytics: `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
 
 **Return Type:** `DashboardMetricsDTO`
 
@@ -373,12 +381,12 @@ Get most active users.
 **Return Type:** `List[TopUserDTO]`
 
 #### `await analytics.get_user_analytics()`
-Get analytics for all users.
+Get analytics for all users (per-user cache metrics: `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
 
 **Return Type:** `List[UserAnalyticsDTO]`
 
 #### `await analytics.get_project_data(top_limit=10)`
-Get project-level analytics data.
+Get project-level analytics data (includes `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
 
 **Parameters:**
 - `top_limit` (int, **optional**): Limit for top results (default: 10, max: 100)

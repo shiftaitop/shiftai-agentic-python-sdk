@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: shiftaiagenticinfra-sdk-python
-Version: 0.0.6
+Version: 0.0.8
 Summary: Shiftai Agentic Infra Python SDK
 Author: ShiftAI
 Author-email: ShiftAI <s.tadakamalla@theshiftai.in>
@@ -46,6 +46,12 @@ This SDK is the official gateway to the Shift AI Agentic Infra services, enablin
   <a href="https://x.com/shift_ai_first">
     <img src="https://img.shields.io/badge/X(Twitter)-@shift__ai__first-black?style=for-the-badge&logo=x">
   </a>
+  <a href="https://www.reddit.com/user/TheShiftAI/">
+    <img src="https://img.shields.io/badge/Reddit-TheShiftAI-FF4500?style=for-the-badge&logo=reddit">
+  </a>
+  <a href="https://substack.com/@shiftaifirst">
+    <img src="https://img.shields.io/badge/Substack-ShiftAI-orange?style=for-the-badge&logo=substack">
+  </a>
 </p>
 
 **ShiftAI** is an AI infrastructure and consulting company focused on building
@@ -63,6 +69,9 @@ AI-driven systems that move beyond experimentation into real-world production.
 - 🐙 GitHub Organization: https://github.com/shiftaitop  
 - 💼 LinkedIn (Company): https://www.linkedin.com/company/theshiftai-in/  
 - 🐦 Twitter (X): https://x.com/shift_ai_first  
+- 🔗 Reddit: https://www.reddit.com/user/TheShiftAI/  
+- ✍️ Substack: https://substack.com/@shiftaifirst  
+  
 
 ### Founder
 - **Suresh Gokarakonda**
@@ -302,6 +311,14 @@ Get all messages sent by a specific agent.
 
 **Return Type:** `List[PlatformMessage]`
 
+#### `await messages.delete_message(message_id)`
+delete a message turn (bot message and its paired human message). Idempotent if already deleted.
+
+**Parameters:**
+- `message_id` (UUID, required): UUID of the **BOT** message to soft-delete
+
+**Return Type:** `Dict[str, Any]` (success: `success`, `message`, `timestamp`; errors: `error`, `message`, `status`, `timestamp`)
+
 ### Users API
 
 #### `await users.create(username, email, metadata=None)`
@@ -350,20 +367,29 @@ print(f"Created agent: {agent.name}")
 
 ### Analytics API
 
-#### `await analytics.submit_feedback(message_id, like=None, dislike=None, feedback=None, regeneration=None)`
-Submit user feedback on a bot message.
+#### `await analytics.submit_feedback(message_id, feedback_title, feedback, liked=None, disliked=None, regeneration=None)`
+Submit user feedback on a BOT message (multiple feedback per message allowed).
 
 **Parameters:**
-- `message_id` (UUID, **required**): ID of the bot message receiving feedback
-- `like` (bool, **optional**): User liked the response (true/false)
-- `dislike` (bool, **optional**): User disliked the response (true/false)
-- `feedback` (str, **optional**): Text feedback or comments (e.g., "Too verbose", "Perfect answer")
+- `message_id` (UUID, **required**): ID of the BOT message receiving feedback
+- `feedback_title` (str, **required**): Title for the feedback (e.g., "Response Quality Feedback")
+- `feedback` (str, **required**): Feedback content (e.g., "The response was very helpful")
+- `liked` (bool, **optional**): User liked the response (true/false)
+- `disliked` (bool, **optional**): User disliked the response (true/false)
 - `regeneration` (bool, **optional**): User requested regeneration (true/false)
 
-**Return Type:** `FeedbackSubmissionResponse`
+**Return Type:** `FeedbackSubmissionResponse` (includes `feedbackId`, `submittedAt`)
+
+#### `await analytics.get_message_feedback(message_id)`
+Get all feedback submissions for a specific BOT message (most recent first).
+
+**Parameters:**
+- `message_id` (UUID, **required**): UUID of the BOT message
+
+**Return Type:** `List[FeedbackDTO]`
 
 #### `await analytics.get_dashboard()`
-Get project dashboard metrics.
+Get project dashboard metrics (includes cache analytics: `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
 
 **Return Type:** `DashboardMetricsDTO`
 
@@ -384,12 +410,12 @@ Get most active users.
 **Return Type:** `List[TopUserDTO]`
 
 #### `await analytics.get_user_analytics()`
-Get analytics for all users.
+Get analytics for all users (per-user cache metrics: `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
 
 **Return Type:** `List[UserAnalyticsDTO]`
 
 #### `await analytics.get_project_data(top_limit=10)`
-Get project-level analytics data.
+Get project-level analytics data (includes `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
 
 **Parameters:**
 - `top_limit` (int, **optional**): Limit for top results (default: 10, max: 100)
