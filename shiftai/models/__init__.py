@@ -336,6 +336,18 @@ class ConversationSummaryResponse:
 
 
 @dataclass
+class GetConversationsByEmailRequest:
+    """Request object for retrieving conversations by user email."""
+    email: str
+
+
+@dataclass
+class DeleteConversationRequest:
+    """Request object for deleting a conversation."""
+    conversationId: UUID
+
+
+@dataclass
 class ConversationMessageResponse:
     """Simplified message response for conversation messages.
 

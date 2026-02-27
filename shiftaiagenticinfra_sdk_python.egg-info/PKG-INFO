@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: shiftaiagenticinfra-sdk-python
-Version: 0.0.8
+Version: 0.0.9
 Summary: Shiftai Agentic Infra Python SDK
 Author: ShiftAI
 Author-email: ShiftAI <s.tadakamalla@theshiftai.in>
@@ -457,6 +457,22 @@ Get all conversations for a specific user.
 - `username` (str, required): Username
 
 **Return Type:** `List[ConversationSummaryResponse]`
+
+#### `await conversations.get_conversations_by_email(email)`
+Get all conversations for a specific user by email.
+
+**Parameters:**
+- `email` (str, required): User's email address
+
+**Return Type:** `List[ConversationSummaryResponse]`
+
+#### `await conversations.delete_conversation(conversation_id)`
+Delete a conversation.
+
+**Parameters:**
+- `conversation_id` (UUID, required): Conversation identifier
+
+**Return Type:** `Dict[str, Any]`
 
 ## Error Handling
 

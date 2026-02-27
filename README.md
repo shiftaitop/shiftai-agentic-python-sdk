@@ -429,6 +429,22 @@ Get all conversations for a specific user.
 
 **Return Type:** `List[ConversationSummaryResponse]`
 
+#### `await conversations.get_conversations_by_email(email)`
+Get all conversations for a specific user by email.
+
+**Parameters:**
+- `email` (str, required): User's email address
+
+**Return Type:** `List[ConversationSummaryResponse]`
+
+#### `await conversations.delete_conversation(conversation_id)`
+Delete a conversation.
+
+**Parameters:**
+- `conversation_id` (UUID, required): Conversation identifier
+
+**Return Type:** `Dict[str, Any]`
+
 ## Error Handling
 
 The SDK surfaces HTTP errors as typed exceptions:
