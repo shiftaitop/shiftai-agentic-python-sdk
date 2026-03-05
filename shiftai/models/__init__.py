@@ -26,18 +26,18 @@ class PlatformRegistrationResponse:
 
 @dataclass
 class AgentData:
-    """Agent information for message submission."""
+    """Agent information for message submission. When platform is omitted, lookup and creation use name and project only."""
     name: str
-    platform: str
+    platform: Optional[str] = None  # Optional; when omitted, lookup/creation use name and project only
     version: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
 
 @dataclass
 class PlatformMessageSubmissionRequest:
-    """Request for submitting platform messages."""
+    """Request for submitting platform messages. Email is required for message submission."""
+    email: str  # Required for message submission
     username: Optional[str] = None
-    email: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
     agentData: Optional[AgentData] = None
     senderType: Optional[str] = None  # "HUMAN" or "BOT"
@@ -180,6 +180,34 @@ class FeedbackDTO:
     disliked: Optional[bool] = None
     regeneration: Optional[bool] = None
     submittedAt: Optional[str] = None  # ISO 8601 datetime string
+
+
+@dataclass
+class LatestFeedbacksRequest:
+    """Request for latest feedbacks; optional time window in hours."""
+    timeperiod: Optional[int] = None  # None or omitted = all; N = last N hours
+
+
+@dataclass
+class LatestFeedbackItemResponse:
+    """Single item in the latest-feedbacks list (POST /api/platform/feedbacks/latest)."""
+    messageId: Optional[UUID] = None
+    username: Optional[str] = None
+    agentName: Optional[str] = None
+    conversationId: Optional[UUID] = None
+    sender: Optional[str] = None
+    message: Optional[str] = None  # Human query the bot was replying to
+    feedbackTitle: Optional[str] = None
+    feedback: Optional[str] = None
+    context: Optional[str] = None
+    time: Optional[str] = None  # ISO-8601 when feedback was submitted
+
+
+@dataclass
+class LatestFeedbacksResponse:
+    """Response from latest feedbacks: list of items and optional message (e.g. empty timeline)."""
+    message: Optional[str] = None  # Set when timeperiod used and no feedbacks in window
+    feedbacks: List[LatestFeedbackItemResponse] = field(default_factory=list)
 
 
 @dataclass

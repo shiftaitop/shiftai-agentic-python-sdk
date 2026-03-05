@@ -46,7 +46,8 @@ class ShiftaiagenticinfraClient:
             username="john",
             message="Hello",
             agent_name="Bot",
-            agent_platform="OpenAI"
+            user_email="john@example.com",
+            agent_platform="OpenAI"  # optional
         )
     """
     

@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: shiftaiagenticinfra-sdk-python
-Version: 0.0.9
+Version: 0.0.10
 Summary: Shiftai Agentic Infra Python SDK
 Author: ShiftAI
 Author-email: ShiftAI <s.tadakamalla@theshiftai.in>
@@ -387,6 +387,14 @@ Get all feedback submissions for a specific BOT message (most recent first).
 - `message_id` (UUID, **required**): UUID of the BOT message
 
 **Return Type:** `List[FeedbackDTO]`
+
+#### `await analytics.get_latest_feedbacks(timeperiod=None)`
+Get latest feedback submissions for the project, most recent first.
+
+**Parameters:**
+- `timeperiod` (int, **optional**): None or omitted = all feedbacks; N (e.g. 24) = only feedbacks from the last N hours
+
+**Return Type:** `LatestFeedbacksResponse` (`.feedbacks` list of `LatestFeedbackItemResponse`; optional `.message` when time window is used and there are no feedbacks)
 
 #### `await analytics.get_dashboard()`
 Get project dashboard metrics (includes cache analytics: `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).

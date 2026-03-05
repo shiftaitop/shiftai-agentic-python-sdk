@@ -133,9 +133,9 @@ async def main():
         username="john_doe",
         message="Hello, how can I help you?",
         agent_name="SupportBot",
-        agent_platform="OpenAI",
-        user_email="john@example.com",
-        agent_version="1.0.0"  # Required: Agent version 
+        user_email="john@example.com",  # Required for message submission
+        agent_platform="OpenAI",        # Optional; when omitted, lookup uses name and project only
+        agent_version="1.0.0"           # Optional; backend defaults to "1.0.0" when omitted
     )
 
     print(f"Message sent! ID: {human_response.messageId}")
@@ -145,11 +145,11 @@ async def main():
         username="john_doe",
         message="I can help you with your questions!",
         agent_name="SupportBot",
-        agent_platform="OpenAI",
-        agent_version="1.0.0",  # Required: Agent version 
         reply_message_id=human_response.messageId,
         rag_context="Retrieved context from knowledge base...",
-        user_email="john@example.com"
+        user_email="john@example.com",  # Required for message submission
+        agent_platform="OpenAI",         # Optional
+        agent_version="1.0.0"           # Optional; backend defaults to "1.0.0" when omitted
     )
 
     # 4. Get analytics
@@ -195,14 +195,14 @@ Send a human message with automatic user/agent creation.
 - `username` (str, **required**): User identifier (e.g., "john_doe", "user123")
 - `message` (str, **required**): The actual message content (e.g., "Hello, how can I help you?")
 - `agent_name` (str, **required**): Target agent name (e.g., "SupportBot", "GPT-4")
-- `agent_platform` (str, **required**): Agent platform/provider (e.g., "OpenAI", "Azure", "Anthropic")
-- `user_email` (str, **required**): User's email address for identification (e.g., "john@example.com")
+- `user_email` (str, **required**): User's email address (required for message submission; e.g., "john@example.com")
+- `agent_platform` (str, **optional**): Agent platform/provider (e.g., "OpenAI", "Azure"). When omitted, lookup/creation use name and project only.
 - `user_metadata` (dict, **optional**): Custom user attributes (e.g., `{"role": "premium", "subscription": "gold"}`)
 - `intent` (str, **optional**): Message intent classification (e.g., "question", "complaint", "request")
 - `entities` (dict, **optional**): Extracted named entities (e.g., `{"person": "John", "location": "New York"}`)
 - `annotations` (dict, **optional**): Additional message annotations (e.g., `{"priority": "high", "tags": ["urgent"]}`)
 - `source_event` (dict, **optional**): Original event data from source system
-- `agent_version` (str, **optional**): Agent version/model (e.g., "gpt-4", "claude-2") - **Required in database**
+- `agent_version` (str, **optional**): Agent version/model (e.g., "gpt-4", "claude-2"). Backend defaults to `"1.0.0"` when omitted.
 - `agent_metadata` (dict, **optional**): Agent configuration data (e.g., `{"temperature": 0.7, "max_tokens": 1000}`)
 - `mode` (str, **optional**): Mode identifier for the message. Allowed values: `"SIMPLE"` or `"EXPAND"`
 - `conversation_id` (UUID, **optional**): Conversation ID to store the HUMAN message in. If omitted, backend creates a new conversation automatically.
@@ -216,16 +216,16 @@ Send a bot response to a human message.
 - `username` (str, **required**): User identifier (must match the human message sender)
 - `message` (str, **required**): Bot response content (e.g., "I can help you with that!")
 - `agent_name` (str, **required**): Agent name (must match the human message agent)
-- `agent_platform` (str, **required**): Agent platform (must match the human message platform)
 - `reply_message_id` (UUID, **required**): ID of the human message being replied to
 - `rag_context` (str, **required**): RAG context used for generating the response
-- `user_email` (str, **required**): User's email address for identification
+- `user_email` (str, **required**): User's email address (required for message submission)
+- `agent_platform` (str, **optional**): Agent platform (must match the human message when provided). When omitted, lookup uses name and project only.
 - `user_metadata` (dict, **optional**): User metadata
 - `intent` (str, **optional**): Response intent
 - `entities` (dict, **optional**): Extracted entities from response
 - `annotations` (dict, **optional**): Response annotations
 - `source_event` (dict, **optional**): Source event data
-- `agent_version` (str, **optional**): Agent version/model - **Required in database**
+- `agent_version` (str, **optional**): Agent version/model. Backend defaults to `"1.0.0"` when omitted.
 - `agent_metadata` (dict, **optional**): Agent configuration
 - `mode` (str, **optional**): Mode identifier for the message. Allowed values: `"SIMPLE"` or `"EXPAND"`
 
@@ -257,7 +257,7 @@ POST `/api/platformsession/endconversation`
 Low-level message submission with full control.
 
 **Parameters:**
-- `request` (PlatformMessageSubmissionRequest, **required**): Complete message request object
+- `request` (PlatformMessageSubmissionRequest, **required**): Complete message request object. `email` is required for message submission; the SDK raises `ValueError` if it is missing or blank.
 
 **Return Type:** `PlatformMessageSubmissionResponse`
 
@@ -358,6 +358,14 @@ Get all feedback submissions for a specific BOT message (most recent first).
 - `message_id` (UUID, **required**): UUID of the BOT message
 
 **Return Type:** `List[FeedbackDTO]`
+
+#### `await analytics.get_latest_feedbacks(timeperiod=None)`
+Get latest feedback submissions for the project, most recent first.
+
+**Parameters:**
+- `timeperiod` (int, **optional**): None or omitted = all feedbacks; N (e.g. 24) = only feedbacks from the last N hours
+
+**Return Type:** `LatestFeedbacksResponse` (`.feedbacks` list of `LatestFeedbackItemResponse`; optional `.message` when time window is used and there are no feedbacks)
 
 #### `await analytics.get_dashboard()`
 Get project dashboard metrics (includes cache analytics: `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
@@ -463,7 +471,8 @@ try:
         username="user",
         message="Hello",
         agent_name="Bot",
-        agent_platform="OpenAI"
+        user_email="user@example.com",  # Required for message submission
+        agent_platform="OpenAI"         # Optional
     )
 except BadRequestException as e:
     print(f"Invalid request: {e}")

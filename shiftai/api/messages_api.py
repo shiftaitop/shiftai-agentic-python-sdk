@@ -26,8 +26,8 @@ class MessagesApi:
         username: str,
         message: str,
         agent_name: str,
-        agent_platform: str,
         user_email: str,
+        agent_platform: Optional[str] = None,
         user_metadata: Optional[Dict[str, Any]] = None,
         intent: Optional[str] = None,
         entities: Optional[Dict[str, Any]] = None,
@@ -48,14 +48,14 @@ class MessagesApi:
             username: Username of the individual sending the message (required)
             message: The actual message content (required)
             agent_name: Agent name identifier (required)
-            agent_platform: Agent platform or provider (required)
-            user_email: Email address for user identification (required)
+            user_email: Email address for user identification (required for message submission)
+            agent_platform: Agent platform or provider (optional; when omitted, lookup/creation use name and project only)
             user_metadata: Optional user-specific metadata
             intent: Optional detected intent or purpose of the message
             entities: Optional named entities extracted from the message
             annotations: Optional additional annotations or tags
             source_event: Optional original source event data
-            agent_version: Optional agent version or model identifier
+            agent_version: Optional agent version or model identifier (backend defaults to "1.0.0" when omitted)
             agent_metadata: Optional additional agent configuration metadata
             mode: Optional mode identifier for the message
             conversation_id: Optional conversation ID for HUMAN messages. If not provided, backend creates a new conversation.
@@ -76,25 +76,21 @@ class MessagesApi:
             raise ValueError("message is required")
         if not agent_name or not agent_name.strip():
             raise ValueError("agent_name is required")
-        if not agent_platform or not agent_platform.strip():
-            raise ValueError("agent_platform is required")
-        if not agent_version or not agent_version.strip():
-            raise ValueError("agent_version is required")
         if not user_email or not user_email.strip():
             raise ValueError("user_email is required")
 
-        # Build agent data
+        # Build agent data (platform and version optional; backend defaults version to "1.0.0" when omitted)
         agent_data = AgentData(
             name=agent_name,
-            platform=agent_platform,
-            version=agent_version,
+            platform=agent_platform.strip() if agent_platform and agent_platform.strip() else None,
+            version=agent_version.strip() if agent_version and agent_version.strip() else None,
             metadata=agent_metadata
         )
         
         # Build request
         request = PlatformMessageSubmissionRequest(
-            username=username,
             email=user_email,
+            username=username,
             metadata=user_metadata,
             message=message,
             intent=intent,
@@ -119,10 +115,10 @@ class MessagesApi:
         username: str,
         message: str,
         agent_name: str,
-        agent_platform: str,
         reply_message_id: UUID,
         rag_context: str,
         user_email: str,
+        agent_platform: Optional[str] = None,
         user_metadata: Optional[Dict[str, Any]] = None,
         intent: Optional[str] = None,
         entities: Optional[Dict[str, Any]] = None,
@@ -143,16 +139,16 @@ class MessagesApi:
             username: Username of the individual (required)
             message: The actual message content (required)
             agent_name: Agent name identifier (required)
-            agent_platform: Agent platform or provider (required)
             reply_message_id: ID of the message this is replying to (required)
             rag_context: Retrieved context from RAG (required)
-            user_email: Email address for user identification (required)
+            user_email: Email address for user identification (required for message submission)
+            agent_platform: Agent platform or provider (optional; when omitted, lookup/creation use name and project only)
             user_metadata: Optional user-specific metadata
             intent: Optional detected intent
             entities: Optional named entities
             annotations: Optional additional annotations
             source_event: Optional original source event data
-            agent_version: Optional agent version
+            agent_version: Optional agent version (backend defaults to "1.0.0" when omitted)
             agent_metadata: Optional additional agent configuration metadata
             mode: Optional mode identifier for the message
             
@@ -172,29 +168,25 @@ class MessagesApi:
             raise ValueError("message is required")
         if not agent_name or not agent_name.strip():
             raise ValueError("agent_name is required")
-        if not agent_platform or not agent_platform.strip():
-            raise ValueError("agent_platform is required")
         if reply_message_id is None:
             raise ValueError("reply_message_id is required for bot messages")
         if not rag_context or not rag_context.strip():
             raise ValueError("rag_context is required for bot messages")
-        if not agent_version or not agent_version.strip():
-            raise ValueError("agent_version is required")
         if not user_email or not user_email.strip():
             raise ValueError("user_email is required")
 
-        # Build agent data
+        # Build agent data (platform and version optional; backend defaults version to "1.0.0" when omitted)
         agent_data = AgentData(
             name=agent_name,
-            platform=agent_platform,
-            version=agent_version,
+            platform=agent_platform.strip() if agent_platform and agent_platform.strip() else None,
+            version=agent_version.strip() if agent_version and agent_version.strip() else None,
             metadata=agent_metadata
         )
         
         # Build request
         request = PlatformMessageSubmissionRequest(
-            username=username,
             email=user_email,
+            username=username,
             metadata=user_metadata,
             message=message,
             intent=intent,
@@ -225,12 +217,17 @@ class MessagesApi:
         POST /api/platform/messages/submit
         
         Args:
-            request: Message submission request object
+            request: Message submission request object (email is required for message submission)
             
         Returns:
             PlatformMessageSubmissionResponse with message ID and contextual prompt
+            
+        Raises:
+            ValueError: If request.email is missing or blank
         """
         self._http_client.ensure_authenticated()
+        if not request.email or not request.email.strip():
+            raise ValueError("User email is required for message submission")
 
         return await self._http_client.post(
             "/api/platform/messages/submit",

@@ -10,6 +10,9 @@ from ..models import (
     FeedbackSubmissionRequest,
     FeedbackSubmissionResponse,
     FeedbackDTO,
+    LatestFeedbacksRequest,
+    LatestFeedbackItemResponse,
+    LatestFeedbacksResponse,
     DashboardMetricsDTO,
     TopAgentDTO,
     TopUserDTO,
@@ -102,6 +105,48 @@ class AnalyticsApi:
             f"/api/analytics/messages/{message_id}/feedback",
             FeedbackDTO,
         )
+
+    async def get_latest_feedbacks(
+        self,
+        timeperiod: Optional[int] = None,
+    ) -> LatestFeedbacksResponse:
+        """
+        Get latest feedback submissions for the project, most recent first.
+
+        POST /api/platform/feedbacks/latest
+
+        Args:
+            timeperiod: Optional. None or omitted = all feedbacks.
+                        N (e.g. 24) = only feedbacks from the last N hours.
+
+        Returns:
+            LatestFeedbacksResponse with .feedbacks (list) and optional .message
+            (e.g. when timeperiod is set and there are no feedbacks in that window).
+        """
+        self._http_client.ensure_authenticated()
+
+        body: Dict[str, Any] = {} if timeperiod is None else {"timeperiod": timeperiod}
+        data = await self._http_client.post_map("/api/platform/feedbacks/latest", body)
+
+        if isinstance(data, list):
+            items = [
+                LatestFeedbackItemResponse(
+                    **self._http_client._filter_known_fields(item, LatestFeedbackItemResponse)
+                )
+                for item in data
+            ]
+            return LatestFeedbacksResponse(feedbacks=items)
+        if isinstance(data, dict):
+            msg = data.get("message")
+            raw_list = data.get("feedbacks", [])
+            items = [
+                LatestFeedbackItemResponse(
+                    **self._http_client._filter_known_fields(item, LatestFeedbackItemResponse)
+                )
+                for item in raw_list
+            ]
+            return LatestFeedbacksResponse(message=msg, feedbacks=items)
+        return LatestFeedbacksResponse(feedbacks=[])
 
     async def get_dashboard(self) -> DashboardMetricsDTO:
         """
