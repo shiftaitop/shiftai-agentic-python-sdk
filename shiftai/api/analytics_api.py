@@ -18,6 +18,12 @@ from ..models import (
     TopUserDTO,
     UserAnalyticsDTO,
     ProjectAnalyticsResponseDTO,
+    UserPreferenceUpdateRequest,
+    UserPreferenceListRequest,
+    UserPreferenceListAllRequest,
+    UserPreferenceItemResponse,
+    UserPreferenceListResponse,
+    UserPreferencesPayload,
 )
 
 
@@ -147,6 +153,98 @@ class AnalyticsApi:
             ]
             return LatestFeedbacksResponse(message=msg, feedbacks=items)
         return LatestFeedbacksResponse(feedbacks=[])
+
+    async def update_user_preference(
+        self,
+        request: UserPreferenceUpdateRequest,
+    ) -> UserPreferenceItemResponse:
+        """
+        Update one user preference item (or remove with value 'DELETE').
+
+        POST /api/analytics/user-preferences/update
+
+        Args:
+            request: profileId, category (USER_PERSONAL|METRICS|CALCULATION), index (0-based), value (text or 'DELETE')
+
+        Returns:
+            UserPreferenceItemResponse with updatedAt set.
+        """
+        self._http_client.ensure_authenticated()
+        if request.profileId is None:
+            raise ValueError("profileId is required")
+        if not request.category or not request.category.strip():
+            raise ValueError("category is required")
+        if request.index is None or request.index < 0:
+            raise ValueError("index must be a non-negative integer")
+        if request.value is None or (isinstance(request.value, str) and not request.value.strip()):
+            raise ValueError("value is required and cannot be blank")
+        data = await self._http_client.post_map("/api/analytics/user-preferences/update", request)
+        return self._parse_user_preference_item(data)
+
+    async def list_user_preferences_by_email(self, email: str) -> UserPreferenceListResponse:
+        """
+        List preferences for one user by email.
+
+        POST /api/analytics/user-preferences/list
+
+        Args:
+            email: User email in the tenant (required).
+
+        Returns:
+            UserPreferenceListResponse with userpreferences list.
+        """
+        self._http_client.ensure_authenticated()
+        if not email or not email.strip():
+            raise ValueError("email is required")
+        request = UserPreferenceListRequest(email=email.strip())
+        data = await self._http_client.post_map("/api/analytics/user-preferences/list", request)
+        return self._parse_user_preference_list_response(data)
+
+    async def list_all_user_preferences(
+        self,
+        limit: Optional[int] = None,
+    ) -> UserPreferenceListResponse:
+        """
+        List all user preferences in the tenant with optional limit.
+
+        POST /api/analytics/user-preferences/list/all
+
+        Args:
+            limit: Max profiles to return (default 50, max 500). Omit or None for default.
+
+        Returns:
+            UserPreferenceListResponse with userpreferences list.
+        """
+        self._http_client.ensure_authenticated()
+        body: Dict[str, Any] = {} if limit is None else {"limit": limit}
+        data = await self._http_client.post_map("/api/analytics/user-preferences/list/all", body)
+        return self._parse_user_preference_list_response(data)
+
+    def _parse_user_preference_item(self, data: Dict[str, Any]) -> UserPreferenceItemResponse:
+        """
+        Build UserPreferenceItemResponse from one item dict (update 200 body or list element).
+        Normalizes userPreferences dict to UserPreferencesPayload so callers get a consistent type.
+        """
+        if not isinstance(data, dict):
+            return UserPreferenceItemResponse()
+        filtered = self._http_client._filter_known_fields(data, UserPreferenceItemResponse)
+        up = filtered.get("userPreferences")
+        if isinstance(up, dict):
+            filtered["userPreferences"] = UserPreferencesPayload(
+                **self._http_client._filter_known_fields(up, UserPreferencesPayload)
+            )
+        return UserPreferenceItemResponse(**filtered)
+
+    def _parse_user_preference_list_response(self, data: Any) -> UserPreferenceListResponse:
+        """Build UserPreferenceListResponse from raw API response (key 'userpreferences')."""
+        if not isinstance(data, dict):
+            return UserPreferenceListResponse(userpreferences=[])
+        raw_list = data.get("userpreferences", [])
+        items: List[UserPreferenceItemResponse] = []
+        for item in raw_list:
+            if isinstance(item, dict):
+                items.append(self._parse_user_preference_item(item))
+        return UserPreferenceListResponse(userpreferences=items)
 
     async def get_dashboard(self) -> DashboardMetricsDTO:
         """

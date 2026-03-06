@@ -350,6 +350,56 @@ class ProjectAnalyticsResponseDTO:
     topDevicesByUsage: Optional[List[Any]] = None
 
 
+# --- User preferences (POST /api/analytics/user-preferences/*) ---
+# Categories: USER_PERSONAL, METRICS, CALCULATION. Use value "DELETE" (case-insensitive) to remove item at index.
+
+@dataclass
+class UserPreferencesPayload:
+    """Nested payload inside UserPreferenceItemResponse: the three category lists."""
+    userPersonalFeedbacks: Optional[List[str]] = None   # USER_PERSONAL
+    metricsFeedbacks: Optional[List[str]] = None        # METRICS
+    calculationFeedbacks: Optional[List[str]] = None     # CALCULATION
+
+
+@dataclass
+class UserPreferenceItemResponse:
+    """Single preference profile (update 200 response and list item). createdAt/updatedAt are ISO-8601 strings."""
+    profileId: Optional[UUID] = None
+    username: Optional[str] = None
+    userEmail: Optional[str] = None
+    botName: Optional[str] = None
+    userPreferences: Optional[UserPreferencesPayload] = None  # Deserialized as dict from JSON; shape matches UserPreferencesPayload
+    createdAt: Optional[str] = None  # ISO-8601
+    updatedAt: Optional[str] = None  # ISO-8601
+
+
+@dataclass
+class UserPreferenceUpdateRequest:
+    """Request for POST /api/analytics/user-preferences/update. value = new text or 'DELETE' to remove item at index."""
+    profileId: UUID
+    category: str   # USER_PERSONAL | METRICS | CALCULATION
+    index: int      # 0-based, non-negative
+    value: str      # New text, or "DELETE" (case-insensitive) to remove
+
+
+@dataclass
+class UserPreferenceListRequest:
+    """Request for POST /api/analytics/user-preferences/list (list by user email)."""
+    email: str
+
+
+@dataclass
+class UserPreferenceListAllRequest:
+    """Request for POST /api/analytics/user-preferences/list/all. limit default 50, max 500."""
+    limit: Optional[int] = None
+
+
+@dataclass
+class UserPreferenceListResponse:
+    """Response for both list endpoints. Backend JSON key is 'userpreferences'."""
+    userpreferences: List[UserPreferenceItemResponse] = field(default_factory=list)
+
+
 @dataclass
 class ConversationSummaryResponse:
     """Response object containing conversation summary information."""

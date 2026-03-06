@@ -367,6 +367,42 @@ Get latest feedback submissions for the project, most recent first.
 
 **Return Type:** `LatestFeedbacksResponse` (`.feedbacks` list of `LatestFeedbackItemResponse`; optional `.message` when time window is used and there are no feedbacks)
 
+#### User preferences (tenant-isolated; require Api-Key)
+
+**Categories:** `USER_PERSONAL` (tone, style, formatting), `METRICS` (structure, visualization), `CALCULATION` (formulas, methods). Use value `"DELETE"` (case-insensitive) to remove the item at the given index.
+
+#### `await analytics.update_user_preference(request)`
+Update one user preference item (or remove with value `"DELETE"`).
+
+**Endpoint:** POST `/api/analytics/user-preferences/update`
+
+**Parameters:**
+- `request` (`UserPreferenceUpdateRequest`, **required**): `profileId` (UUID), `category` (USER_PERSONAL | METRICS | CALCULATION), `index` (0-based, non-negative), `value` (new text or `"DELETE"` to remove item at index)
+
+**Return Type:** `UserPreferenceItemResponse` (includes `updatedAt` on success)
+
+#### `await analytics.list_user_preferences_by_email(email)`
+List preferences for one user by email.
+
+**Endpoint:** POST `/api/analytics/user-preferences/list`
+
+**Parameters:**
+- `email` (str, **required**): User email in the tenant (e.g. `"john@example.com"`)
+
+**Return Type:** `UserPreferenceListResponse` (`.userpreferences` list of `UserPreferenceItemResponse`)
+
+#### `await analytics.list_all_user_preferences(limit=None)`
+List all user preferences in the tenant with optional limit.
+
+**Endpoint:** POST `/api/analytics/user-preferences/list/all`
+
+**Parameters:**
+- `limit` (int, **optional**): Max profiles to return (default 50, max 500). Omit or `None` for default.
+
+**Return Type:** `UserPreferenceListResponse` (`.userpreferences` list of `UserPreferenceItemResponse`)
+
+**Response shape (single profile):** `UserPreferenceItemResponse` has `profileId`, `username`, `userEmail`, `botName`, `userPreferences` (object with `userPersonalFeedbacks`, `metricsFeedbacks`, `calculationFeedbacks` arrays of strings), `createdAt`, `updatedAt` (ISO-8601).
+
 #### `await analytics.get_dashboard()`
 Get project dashboard metrics (includes cache analytics: `cacheServed`, `estimatedTokensSaved`, `estimatedCostSaved` when available).
 
