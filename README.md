@@ -139,6 +139,7 @@ async def main():
     )
 
     print(f"Message sent! ID: {human_response.messageId}")
+    print(f"Org context: {human_response.orgContext}")  # Optional; may be null if org knowledge is unavailable/not configured
 
     # 3. Send a bot response
     bot_response = await client.messages.send_bot_message(
@@ -233,6 +234,7 @@ Send a bot response to a human message.
 
 **Response Notes (Cache):**
 - `cacheHit` / `cacheResponse` may be present when the backend cache API was checked (typically for HUMAN messages).
+- `orgContext` may be present in submission response (typically HUMAN flow). May be null if org knowledge is unavailable, or not configured.
 
 ### Platform Session API
 
@@ -260,6 +262,13 @@ Low-level message submission with full control.
 - `request` (PlatformMessageSubmissionRequest, **required**): Complete message request object. `email` is required for message submission; the SDK raises `ValueError` if it is missing or blank.
 
 **Return Type:** `PlatformMessageSubmissionResponse`
+
+**Response fields to expect in `PlatformMessageSubmissionResponse`:**
+- `success`, `messageId`, `conversationId`, `message`
+- `contextualPrompt`, `humanQuery`, `previousKConversations`, `similarConversations`
+- `operationStatus`, `conversationTitle`
+- `cacheResponse`, `cacheHit`
+- `orgContext` (optional; typically HUMAN flow. May be null if org knowledge is unavailable, or not configured.)
 
 #### `await messages.get_all()`
 Get all messages for the authenticated project.

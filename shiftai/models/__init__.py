@@ -94,6 +94,9 @@ class PlatformMessageSubmissionResponse:
     # Cache metadata (only present when cache was checked)
     cacheResponse: Optional[str] = None
     cacheHit: Optional[bool] = None
+    # Organization context from Org Knowledge API (typically HUMAN flow).
+    # May be null if org knowledge is unavailable, or not configured.
+    orgContext: Optional[str] = None
 
 
 @dataclass
@@ -244,6 +247,9 @@ class PlatformMessage:
     sourceEvent: Optional[Dict[str, Any]] = None
     messageEmbedding: Optional[str] = None
     generatedContext: Optional[str] = None
+    # Persisted organization context from backend `platform_messages.org_context`.
+    # May be null if org knowledge is unavailable, or not configured.
+    orgContext: Optional[str] = None
     ragContext: Optional[str] = None
     cacheHit: Optional[bool] = None
     cacheResponse: Optional[str] = None

@@ -61,7 +61,9 @@ class MessagesApi:
             conversation_id: Optional conversation ID for HUMAN messages. If not provided, backend creates a new conversation.
             
         Returns:
-            PlatformMessageSubmissionResponse with message ID and contextual prompt
+            PlatformMessageSubmissionResponse with message ID and contextual prompt.
+            Response may include orgContext (organization context from Org Knowledge API);
+            it may be null if org knowledge is unavailable, or not configured.
             
         Raises:
             ValueError: If required fields are missing or API key is not configured
@@ -153,7 +155,9 @@ class MessagesApi:
             mode: Optional mode identifier for the message
             
         Returns:
-            PlatformMessageSubmissionResponse with message ID
+            PlatformMessageSubmissionResponse with message ID.
+            orgContext is primarily relevant to HUMAN flow and may be null if
+            org knowledge is unavailable, or not configured.
             
         Raises:
             ValueError: If required fields are missing or API key is not configured
@@ -220,7 +224,8 @@ class MessagesApi:
             request: Message submission request object (email is required for message submission)
             
         Returns:
-            PlatformMessageSubmissionResponse with message ID and contextual prompt
+            PlatformMessageSubmissionResponse with message ID and contextual prompt.
+            Response may include orgContext (optional).
             
         Raises:
             ValueError: If request.email is missing or blank
